@@ -1,31 +1,56 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>P2P Stream Pro</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>P2P Video Player - Auto Rotation</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 </head>
 <body>
-    <header><button id="menuBtn">☰</button><div id="my-id-display">ID: ...</div></header>
-    <nav id="sidebar" class="sidebar">
-        <button onclick="copyInvite()">Invitar Amigo (WhatsApp)</button>
-        <div id="user-list"></div>
-    </nav>
-    <main>
-        <div id="player" class="video-container">
-            <video id="mainVideo" autoplay playsinline></video>
-            <button id="fullscreenBtn">⛶</button>
+    <div class="app" id="app">
+        <div class="video-container" id="videoContainer">
+            <video id="videoPlayer" playsinline></video>
+            <div class="controls-overlay" id="controlsOverlay">
+                <div class="top-bar">
+                    <div class="peer-info" id="peerIdDisplay">Iniciando...</div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="orientation-btn" id="orientationBtn" title="Rotar pantalla">🔄</button>
+                        <button class="control-btn" id="fullscreenBtn">⛶</button>
+                    </div>
+                </div>
+                <div class="bottom-bar">
+                    <div class="progress-container" id="progressContainer">
+                        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+                    </div>
+                    <div class="control-buttons">
+                        <button class="control-btn" id="playPauseBtn">▶</button>
+                        <button class="control-btn" id="rewindBtn">↺</button>
+                        <button class="control-btn" id="forwardBtn">↻</button>
+                        <div class="time-display" id="timeDisplay">0:00 / 0:00</div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="controls">
-            <label class="btn">📁 Archivo <input type="file" id="fileInput" hidden></label>
-            <button id="shareScreenBtn" class="btn">📺 Compartir Pantalla</button>
+        <div class="action-buttons">
+            <button class="action-btn" id="inviteBtn">👥 Invitar</button>
+            <label class="action-btn primary">📁 Video <input type="file" id="fileInput" accept="video/*" hidden></label>
         </div>
-        <div class="chat">
-            <div id="chat-box"></div>
-            <div class="chat-input"><input type="text" id="msgInput"><button id="sendBtn">➤</button></div>
+        <button class="chat-toggle" id="chatToggle">💬</button>
+        <div class="chat-panel" id="chatPanel">
+            <div class="chat-header"><h3>Chat</h3><button class="close-menu" id="closeChat">✕</button></div>
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" placeholder="Escribe un mensaje..."><button id="sendBtn">Enviar</button>
+            </div>
         </div>
-    </main>
+        <div class="invite-menu" id="inviteMenu">
+            <button class="close-menu" id="closeInvite">✕</button>
+            <h3>Invitar amigo</h3>
+            <input type="text" id="inviteLink" readonly>
+            <button id="copyLinkBtn">Copiar enlace</button>
+        </div>
+    </div>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

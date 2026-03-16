@@ -1,15 +1,31 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stream P2P</title>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P2P Stream Pro</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 </head>
 <body>
-    <h1>Mi App de Streaming</h1>
-    <video id="mainVideo" autoplay playsinline style="width:100%; background:black;"></video>
+    <header><button id="menuBtn">☰</button><div id="my-id-display">ID: ...</div></header>
+    <nav id="sidebar" class="sidebar">
+        <button onclick="copyInvite()">Invitar Amigo (WhatsApp)</button>
+        <div id="user-list"></div>
+    </nav>
+    <main>
+        <div id="player" class="video-container">
+            <video id="mainVideo" autoplay playsinline></video>
+            <button id="fullscreenBtn">⛶</button>
+        </div>
+        <div class="controls">
+            <label class="btn">📁 Archivo <input type="file" id="fileInput" hidden></label>
+            <button id="shareScreenBtn" class="btn">📺 Compartir Pantalla</button>
+        </div>
+        <div class="chat">
+            <div id="chat-box"></div>
+            <div class="chat-input"><input type="text" id="msgInput"><button id="sendBtn">➤</button></div>
+        </div>
+    </main>
     <script src="script.js"></script>
 </body>
 </html>

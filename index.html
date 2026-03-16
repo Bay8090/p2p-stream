@@ -3,21 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>P2P Video Player - Auto Rotation</title>
+    <title>P2P Stream Pro</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="app" id="app">
+    <div class="app portrait-mode" id="app">
         <div class="video-container" id="videoContainer">
             <video id="videoPlayer" playsinline></video>
+            
             <div class="controls-overlay" id="controlsOverlay">
                 <div class="top-bar">
                     <div class="peer-info" id="peerIdDisplay">Iniciando...</div>
                     <div style="display: flex; gap: 10px;">
-                        <button class="orientation-btn" id="orientationBtn" title="Rotar pantalla">🔄</button>
+                        <button class="orientation-btn" id="orientationBtn">🔄</button>
                         <button class="control-btn" id="fullscreenBtn">⛶</button>
                     </div>
                 </div>
+
                 <div class="bottom-bar">
                     <div class="progress-container" id="progressContainer">
                         <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
@@ -31,22 +33,29 @@
                 </div>
             </div>
         </div>
+
         <div class="action-buttons">
             <button class="action-btn" id="inviteBtn">👥 Invitar</button>
-            <label class="action-btn primary">📁 Video <input type="file" id="fileInput" accept="video/*" hidden></label>
+            <label class="action-btn primary">
+                📁 Video
+                <input type="file" id="fileInput" accept="video/*" hidden>
+            </label>
         </div>
+
         <button class="chat-toggle" id="chatToggle">💬</button>
+
         <div class="chat-panel" id="chatPanel">
             <div class="chat-header"><h3>Chat</h3><button class="close-menu" id="closeChat">✕</button></div>
-            <div class="chat-messages" id="chatMessages"></div>
+            <div id="chatMessages" class="chat-messages"></div>
             <div class="chat-input-area">
-                <input type="text" id="chatInput" placeholder="Escribe un mensaje..."><button id="sendBtn">Enviar</button>
+                <input type="text" id="chatInput" placeholder="Mensaje..."><button id="sendBtn">Enviar</button>
             </div>
         </div>
+
         <div class="invite-menu" id="inviteMenu">
             <button class="close-menu" id="closeInvite">✕</button>
-            <h3>Invitar amigo</h3>
-            <input type="text" id="inviteLink" readonly>
+            <h3>Enlace de invitación</h3>
+            <input type="text" id="inviteLink" readonly style="color:black">
             <button id="copyLinkBtn">Copiar enlace</button>
         </div>
     </div>

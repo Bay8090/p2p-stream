@@ -2,8 +2,6 @@ const app = document.getElementById('app');
 const videoPlayer = document.getElementById('videoPlayer');
 const videoContainer = document.getElementById('videoContainer');
 const playPauseBtn = document.getElementById('playPauseBtn');
-const fullscreenBtn = document.getElementById('fullscreenBtn');
-const orientationBtn = document.getElementById('orientationBtn');
 const progressFill = document.getElementById('progressFill');
 const peerIdDisplay = document.getElementById('peerIdDisplay');
 const fileInput = document.getElementById('fileInput');
@@ -30,9 +28,24 @@ function initPeer() {
         peerIdDisplay.textContent = "ID: " + id.substring(0, 6);
         inviteLink.value = window.location.href.split('#')[0] + "#" + id;
     });
-    peer.on('connection', setupConnection);
+
+    peer.on('connection', conn => {
+        setupConnection(conn);
+        setTimeout(() => {
+            if (conn.open) {
+                conn.send({
+                    type: 'command',
+                    cmd: 'sync',
+                    time: videoPlayer.currentTime,
+                    playing: !videoPlayer.paused
+                });
+            }
+        }, 2000);
+    });
+
     peer.on('call', call => {
-        call.answer(videoPlayer.captureStream ? videoPlayer.captureStream() : null);
+        const stream = videoPlayer.captureStream ? videoPlayer.captureStream() : null;
+        call.answer(stream);
         call.on('stream', s => videoPlayer.srcObject = s);
     });
 }
@@ -46,24 +59,38 @@ function setupConnection(conn) {
 }
 
 function handleVideoCommand(data) {
-    if (data.cmd === 'play') { videoPlayer.play(); isPlaying = true; playPauseBtn.textContent = '⏸'; }
-    else if (data.cmd === 'pause') { videoPlayer.pause(); isPlaying = false; playPauseBtn.textContent = '▶'; }
-    else if (data.cmd === 'seek') videoPlayer.currentTime = data.time;
+    switch(data.cmd) {
+        case 'play': videoPlayer.play(); isPlaying = true; break;
+        case 'pause': videoPlayer.pause(); isPlaying = false; break;
+        case 'seek': videoPlayer.currentTime = data.time; break;
+        case 'sync':
+            videoPlayer.currentTime = data.time;
+            if (data.playing) videoPlayer.play(); else videoPlayer.pause();
+            isPlaying = data.playing;
+            break;
+    }
+    playPauseBtn.textContent = isPlaying ? '⏸' : '▶';
 }
 
 function broadcast(data) { connections.forEach(c => c.open && c.send(data)); }
 
-videoContainer.addEventListener('click', () => {
-    videoContainer.classList.add('tap-active');
-    clearTimeout(hideControlsTimeout);
-    hideControlsTimeout = setTimeout(() => videoContainer.classList.remove('tap-active'), 2000);
-});
-
 playPauseBtn.onclick = (e) => {
     e.stopPropagation();
-    if (isPlaying) { videoPlayer.pause(); broadcast({type:'command', cmd:'pause'}); }
-    else { videoPlayer.play(); broadcast({type:'command', cmd:'play'}); }
-    isPlaying = !isPlaying; playPauseBtn.textContent = isPlaying ? '⏸' : '▶';
+    if (videoPlayer.paused) {
+        videoPlayer.play(); broadcast({type:'command', cmd:'play'});
+    } else {
+        videoPlayer.pause(); broadcast({type:'command', cmd:'pause'});
+    }
+    isPlaying = !videoPlayer.paused;
+    playPauseBtn.textContent = isPlaying ? '⏸' : '▶';
+};
+
+document.getElementById('progressContainer').onclick = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const pos = (e.clientX - rect.left) / rect.width;
+    const newTime = pos * videoPlayer.duration;
+    videoPlayer.currentTime = newTime;
+    broadcast({type: 'command', cmd: 'seek', time: newTime});
 };
 
 fileInput.onchange = (e) => {
@@ -76,11 +103,6 @@ fileInput.onchange = (e) => {
         };
     }
 };
-
-document.getElementById('inviteBtn').onclick = () => document.getElementById('inviteMenu').classList.add('show');
-document.getElementById('closeInvite').onclick = () => document.getElementById('inviteMenu').classList.remove('show');
-document.getElementById('chatToggle').onclick = () => document.getElementById('chatPanel').classList.add('show');
-document.getElementById('closeChat').onclick = () => document.getElementById('chatPanel').classList.remove('show');
 
 document.getElementById('sendBtn').onclick = () => {
     const text = chatInput.value.trim();
@@ -101,5 +123,8 @@ function addMessage(text, own, sender) {
 window.onload = () => {
     initPeer();
     const hash = window.location.hash.substring(1);
-    if (hash) setTimeout(() => setupConnection(peer.connect(hash)), 1000);
+    if (hash) {
+        const conn = peer.connect(hash);
+        conn.on('open', () => setupConnection(conn));
+    }
 };

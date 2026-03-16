@@ -3,60 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>P2P Stream Pro</title>
+    <title>P2P Cinema Pro</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="app portrait-mode" id="app">
+    <div class="app" id="app">
         <div class="video-container" id="videoContainer">
             <video id="videoPlayer" playsinline></video>
-            
             <div class="controls-overlay" id="controlsOverlay">
                 <div class="top-bar">
-                    <div class="peer-info" id="peerIdDisplay">Iniciando...</div>
-                    <div style="display: flex; gap: 10px;">
-                        <button class="orientation-btn" id="orientationBtn">🔄</button>
-                        <button class="control-btn" id="fullscreenBtn">⛶</button>
-                    </div>
+                    <span class="status-badge" id="peerIdDisplay">Conectando...</span>
+                    <button class="icon-btn" id="fullscreenBtn">⛶</button>
                 </div>
-
                 <div class="bottom-bar">
                     <div class="progress-container" id="progressContainer">
-                        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+                        <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
                     </div>
-                    <div class="control-buttons">
-                        <button class="control-btn" id="playPauseBtn">▶</button>
-                        <button class="control-btn" id="rewindBtn">↺</button>
-                        <button class="control-btn" id="forwardBtn">↻</button>
-                        <div class="time-display" id="timeDisplay">0:00 / 0:00</div>
+                    <div class="main-controls">
+                        <button class="play-btn" id="playPauseBtn">▶</button>
+                        <span class="time-text" id="timeDisplay">00:00 / 00:00</span>
                     </div>
                 </div>
             </div>
         </div>
-
-        <div class="action-buttons">
+        <div class="action-bar">
             <button class="action-btn" id="inviteBtn">👥 Invitar</button>
             <label class="action-btn primary">
-                📁 Video
+                📁 Seleccionar Video
                 <input type="file" id="fileInput" accept="video/*" hidden>
             </label>
+            <button class="action-btn" id="chatToggle">💬 Chat</button>
         </div>
-
-        <button class="chat-toggle" id="chatToggle">💬</button>
-
-        <div class="chat-panel" id="chatPanel">
-            <div class="chat-header"><h3>Chat</h3><button class="close-menu" id="closeChat">✕</button></div>
-            <div id="chatMessages" class="chat-messages"></div>
-            <div class="chat-input-area">
-                <input type="text" id="chatInput" placeholder="Mensaje..."><button id="sendBtn">Enviar</button>
+        <div class="modal" id="inviteMenu">
+            <div class="modal-content">
+                <h3>Link de Invitación</h3>
+                <input type="text" id="inviteLink" readonly>
+                <button class="action-btn primary" id="copyLinkBtn">Copiar Enlace</button>
+                <button class="close-txt" id="closeInvite">Cerrar</button>
             </div>
         </div>
-
-        <div class="invite-menu" id="inviteMenu">
-            <button class="close-menu" id="closeInvite">✕</button>
-            <h3>Enlace de invitación</h3>
-            <input type="text" id="inviteLink" readonly style="color:black">
-            <button id="copyLinkBtn">Copiar enlace</button>
+        <div class="chat-panel" id="chatPanel">
+            <div class="chat-header"><span>Chat en vivo</span><button id="closeChat">✕</button></div>
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" placeholder="Escribe algo...">
+                <button id="sendBtn">➤</button>
+            </div>
         </div>
     </div>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>

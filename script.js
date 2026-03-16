@@ -1,61 +1,69 @@
-const videoPlayer = document.getElementById('videoPlayer');
-const playPauseBtn = document.getElementById('playPauseBtn');
-const inviteBtn = document.getElementById('inviteBtn');
-const inviteMenu = document.getElementById('inviteMenu');
-const chatToggle = document.getElementById('chatToggle');
-const chatPanel = document.getElementById('chatPanel');
-const fileInput = document.getElementById('fileInput');
+document.addEventListener('DOMContentLoaded', () => {
+    const video = document.getElementById('videoPlayer');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const fileInput = document.getElementById('fileInput');
+    const inviteBtn = document.getElementById('inviteBtn');
+    const inviteMenu = document.getElementById('inviteMenu');
+    const chatToggle = document.getElementById('chatToggle');
+    const chatPanel = document.getElementById('chatPanel');
+    const progressFill = document.getElementById('progressFill');
 
-let peer, connections = [], isPlaying = false;
+    let peer = new Peer();
+    let connections = [];
 
-// Inicializar Peer
-peer = new Peer();
-peer.on('open', id => {
-    document.getElementById('peerIdDisplay').innerText = "ID: " + id.substring(0,5);
-    document.getElementById('inviteLink').value = window.location.href.split('#')[0] + "#" + id;
+    // --- Funciones de Interfaz ---
+    playPauseBtn.onclick = () => {
+        if (video.paused) { video.play(); playPauseBtn.innerText = "⏸"; }
+        else { video.pause(); playPauseBtn.innerText = "▶"; }
+        broadcast({ type: 'control', action: video.paused ? 'pause' : 'play' });
+    };
+
+    fileInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            video.src = URL.createObjectURL(file);
+            video.play();
+            playPauseBtn.innerText = "⏸";
+        }
+    };
+
+    inviteBtn.onclick = () => inviteMenu.style.display = 'flex';
+    document.getElementById('closeInvite').onclick = () => inviteMenu.style.display = 'none';
+    chatToggle.onclick = () => chatPanel.classList.toggle('active');
+    document.getElementById('closeChat').onclick = () => chatPanel.classList.remove('active');
+
+    // --- P2P Lógica ---
+    peer.on('open', id => {
+        document.getElementById('peerIdDisplay').innerText = "ID: " + id.substring(0,6);
+        document.getElementById('inviteLink').value = window.location.origin + window.location.pathname + "#" + id;
+    });
+
+    peer.on('connection', conn => {
+        connections.push(conn);
+        conn.on('data', data => handleData(data));
+    });
+
+    function broadcast(obj) {
+        connections.forEach(c => { if(c.open) c.send(obj); });
+    }
+
+    function handleData(data) {
+        if(data.type === 'control') {
+            if(data.action === 'play') video.play();
+            else video.pause();
+        }
+    }
+
+    // --- Progreso ---
+    video.ontimeupdate = () => {
+        const pct = (video.currentTime / video.duration) * 100;
+        progressFill.style.width = pct + "%";
+        document.getElementById('timeDisplay').innerText = formatTime(video.currentTime) + " / " + formatTime(video.duration);
+    };
+
+    function formatTime(sec) {
+        const m = Math.floor(sec / 60);
+        const s = Math.floor(sec % 60);
+        return m + ":" + (s < 10 ? "0" + s : s);
+    }
 });
-
-// Funcionamiento de Menús
-inviteBtn.onclick = () => inviteMenu.classList.add('show');
-document.getElementById('closeInvite').onclick = () => inviteMenu.classList.remove('show');
-chatToggle.onclick = () => chatPanel.classList.toggle('show');
-document.getElementById('closeChat').onclick = () => chatPanel.classList.remove('show');
-
-// Seleccionar Video
-fileInput.onchange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-        videoPlayer.src = URL.createObjectURL(file);
-        videoPlayer.play();
-        playPauseBtn.innerText = "⏸";
-        isPlaying = true;
-    }
-};
-
-// Play / Pause
-playPauseBtn.onclick = () => {
-    if (videoPlayer.paused) {
-        videoPlayer.play();
-        playPauseBtn.innerText = "⏸";
-    } else {
-        videoPlayer.pause();
-        playPauseBtn.innerText = "▶";
-    }
-};
-
-// Progreso
-videoPlayer.ontimeupdate = () => {
-    const pct = (videoPlayer.currentTime / videoPlayer.duration) * 100;
-    document.getElementById('progressFill').style.width = pct + "%";
-};
-
-// Chat
-document.getElementById('sendBtn').onclick = () => {
-    const msg = document.getElementById('chatInput').value;
-    if(msg) {
-        const div = document.createElement('div');
-        div.innerText = "Tú: " + msg;
-        document.getElementById('chatMessages').appendChild(div);
-        document.getElementById('chatInput').value = "";
-    }
-};

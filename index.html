@@ -7,47 +7,43 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="app" id="app">
-        <div class="video-container" id="videoContainer">
+    <div class="app">
+        <div class="video-container">
             <video id="videoPlayer" playsinline></video>
-            <div class="controls-overlay" id="controlsOverlay">
+            <div class="controls-overlay">
                 <div class="top-bar">
-                    <span class="status-badge" id="peerIdDisplay">Conectando...</span>
-                    <button class="icon-btn" id="fullscreenBtn">⛶</button>
+                    <span id="peerIdDisplay" class="status-badge">Iniciando...</span>
                 </div>
-                <div class="bottom-bar">
-                    <div class="progress-container" id="progressContainer">
-                        <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
-                    </div>
-                    <div class="main-controls">
-                        <button class="play-btn" id="playPauseBtn">▶</button>
-                        <span class="time-text" id="timeDisplay">00:00 / 00:00</span>
-                    </div>
+                <div class="bottom-controls">
+                    <button onclick="togglePlay()" id="playPauseBtn" class="play-btn">▶</button>
+                    <div class="progress-bar"><div id="progressFill" class="fill"></div></div>
                 </div>
             </div>
         </div>
+
         <div class="action-bar">
-            <button class="action-btn" id="inviteBtn">👥 Invitar</button>
+            <button onclick="openInvite()" class="action-btn">👥 Invitar</button>
             <label class="action-btn primary">
-                📁 Seleccionar Video
-                <input type="file" id="fileInput" accept="video/*" hidden>
+                📁 Video <input type="file" id="fileInput" accept="video/*" hidden onchange="loadVideo(event)">
             </label>
-            <button class="action-btn" id="chatToggle">💬 Chat</button>
+            <button onclick="toggleChat()" class="action-btn">💬 Chat</button>
         </div>
-        <div class="modal" id="inviteMenu">
+
+        <div id="inviteMenu" class="modal">
             <div class="modal-content">
-                <h3>Link de Invitación</h3>
+                <h3>Invitar Amigo</h3>
                 <input type="text" id="inviteLink" readonly>
-                <button class="action-btn primary" id="copyLinkBtn">Copiar Enlace</button>
-                <button class="close-txt" id="closeInvite">Cerrar</button>
+                <button onclick="copyLink()" class="action-btn primary">Copiar Enlace</button>
+                <button onclick="closeInvite()" class="close-btn">Cerrar</button>
             </div>
         </div>
-        <div class="chat-panel" id="chatPanel">
-            <div class="chat-header"><span>Chat en vivo</span><button id="closeChat">✕</button></div>
-            <div class="chat-messages" id="chatMessages"></div>
+
+        <div id="chatPanel" class="chat-panel">
+            <div class="chat-header"><span>Chat en vivo</span><button onclick="toggleChat()">✕</button></div>
+            <div id="chatMessages" class="chat-box"></div>
             <div class="chat-input-area">
-                <input type="text" id="chatInput" placeholder="Escribe algo...">
-                <button id="sendBtn">➤</button>
+                <input type="text" id="chatInput" placeholder="Escribe...">
+                <button onclick="sendMsg()">➤</button>
             </div>
         </div>
     </div>
